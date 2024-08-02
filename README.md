@@ -25,6 +25,16 @@ This repository will contain a .cpp and .h file for each functionality to make f
 
 - [Documentation](https://ttblaze.iifl.com/doc/marketdata/)
 
+
+## References
+
+- [CURL Usage](https://gist.github.com/alghanmi/c5d7b761b2c9ab199157)
+- [CURL Post Usage](hhttps://curl.se/libcurl/c/CURLOPT_POST.html)
+- [CURL Write function Usage](https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html)
+- [Headers functionality](https://stackoverflow.com/questions/69494595/libcurl-how-to-update-a-specific-header-information-which-is-aleady-set)
+- [Json functionality](https://sourceforge.net/p/jsoncpp/discussion/483465/thread/f49c6ba7/)
+
+
 ## 🔗 Links
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/siddhanth-mate-9b0127222/)
 [![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/SiddhanthMate)
