@@ -1,4 +1,13 @@
+// Please install curl libraries before using
+// also note its best to run the function using this: g++ main.cpp -o main -lcurl
+
+
 #include "main.h"
+
+#define URL "https://ttblaze.iifl.com"
+#define HOST_LOOK_UP_PATH ":4000/HostLookUp"
+#define LOGIN_PATH "/apimarketdata/auth/login"
+
 
 std::filesystem::path current_wordking_directory = std::filesystem::current_path();
 std::filesystem::path config_file_path = current_wordking_directory / "login_xts.ini";
@@ -66,7 +75,7 @@ void MarketDataCredentials::hostLookUp(){
     curl = curl_easy_init();
     if(curl){
         try {    
-            std::string HOST_LOOKUP_URL = url + ":4000/HostLookUp";
+            std::string HOST_LOOKUP_URL = URL + HOST_LOOK_UP_PATH;
             curl_easy_setopt(curl, CURLOPT_URL, HOST_LOOKUP_URL.c_str());//have to use c_str() for libcurl which is c specific
             curl_easy_setopt(curl, CURLOPT_POST, 1L); //adding this post functionality
 
@@ -79,7 +88,7 @@ void MarketDataCredentials::hostLookUp(){
             std::string json_data_str = Json::writeString(writer, json_data);
 
             // update the headers here
-            struct curl_slist *headers = nullptr;
+            struct curl_slist *headers = NULL;
             headers = curl_slist_append(headers, "Content-Type: application/json");
             curl_easy_setopt(curl,CURLOPT_HTTPHEADER, headers);
             curl_easy_setopt(curl,CURLOPT_POSTFIELDS, json_data_str.c_str());
@@ -121,5 +130,52 @@ void MarketDataCredentials::hostLookUp(){
             writeConfig("auth_token",auth_token);
         }
 
+    }
+}
+
+
+void MarketDataCredentials::loginMarketApi() {
+    std::string authToken;
+    
+    try {
+        authToken = readConfig("auth_token");
+    } catch (std::runtime_error& e){
+        throw std::runtime_error("Error occured while getting authToken from readConfig()")
+    }
+
+    if (authToken.empty()){
+        hostLookUp();
+        authToken = readConfig("unique_key");
+    }
+
+    CURL* curl;
+    CURLcode res;
+    std::string resBuffer;
+
+    curl = curl_easy_init();
+
+    if (curl) {
+        std::string LOGIN_MARKET_URL = URL + LOGIN_PATH;
+
+        try {
+            Json::Value payload;
+            payload["secretKey"] = secret_key;
+            payload["apiKey"] = api_key;
+            payload["source"] = "WebAPI";
+            
+            Json::StreamWriterBuilder writer;
+            std::string payloadString = Json::writeString(writer, payload);
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error("Error arising in creation of payload for loginMarketApi()");
+        }
+
+        try {
+            struct curl_slist* headers = NULL;
+            // just an explanation here since i got confused curl_slist_append() returns the head of the list each time
+            headers = curl_slist_append(headers, ("Content-Type: application/json"));
+            headers = curl_slist_append(headers, ("authorization: " + authToken.c_str())); //since its a c lib you need to convert the string
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error("Error arising in creation of headers for loginMarketApi()");
+        }
     }
 }
